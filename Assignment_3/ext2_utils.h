@@ -1,0 +1,14 @@
+extern char* get_bit_map(char *bitmap, int count);
+extern void print_inode(struct ext2_inode *inode, int i);
+extern void print_inode_dirs(struct ext2_inode *inode, int i);
+extern void print_dir_entry(struct ext2_dir_entry_2 *de);
+extern int get_dir_inode(char *dirstr, struct ext2_inode *inode);
+extern void set_paths (char *path, char *file);
+extern int get_item_inode(char* dirstr, struct ext2_inode *inode);
+extern int get_item_dir(char* dirstr, struct ext2_inode *inode);
+extern int del_file(struct ext2_inode *inode, int offset, char *file);
+extern void bitmap_rm (unsigned int *bitmap, int location);
+extern int get_file_inode(struct ext2_inode *inode, char *filename);
+extern unsigned int get_free_inode();
+extern unsigned int get_free_block();
+extern void add_bitmap (unsigned int *bitmap, int location);

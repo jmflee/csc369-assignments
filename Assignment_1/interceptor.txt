@@ -1,0 +1,160 @@
+============================================================================================================
+#
+# The following text are notes for understanding interceptor.c for CSC369
+# Explanation for each function in intercepttor.c is provided below
+#
+============================================================================================================
+
+void set_addr_rw(unsigned long addr)
+
+    Purpose: 
+	makes sys_call_table read-write before placing a syscall
+
+
+void set_addr_ro(unsigned long addr)
+
+    Purpose:
+	restore sys_call_table to be read-only
+
+
+static int add_pid_sysc(pid_t pid, int sysc)
+
+    Purpose:
+	add a PID to a syscall's monitored list of pids
+	returns -ENOMEM if the operation is unsuccessful
+        returns 0 if sucessful
+
+    Arguments:
+	pid => the pid to add
+	sysc => syscall number
+
+
+static int del_pid_sysc(pid_t pid, int sysc)
+
+    Purpose:
+	remove a pid from a syscall's list of monitored pids
+	returns -ENIVAL if no such pid was found in the list
+        otherwise returns 0 if pid is found
+
+    Arguments:
+	pid => pid to remove
+	sysc => syscall to remove from
+
+
+static int del_pid(pid_t pid)
+
+    Purpose:
+	remove a pid from ALL the list of monitored pids
+	returns -1 if this process is not being monitored in any list
+        otherwise returns 0 if pid exists int the list
+
+    Arguments:
+	pid => pid to remove from all monitored list
+
+
+static void destroy_list(int sysc)
+
+    Purpose:
+	Clear the list of monitored pids for a specific syscall
+
+    Arguments:
+	sysc => syscall to remove list of monitored pids
+
+
+static int check_pid_from_list(pid_t pid1, pid_t pid2)
+
+    Purpose:
+	check if pid1 and pid2 have the same owner
+    returns -EPERM (error permisisons) if they are from different owners
+        otherwise, greenlights with a return of 0
+
+    Arguments:
+	pid1 => checks pid owner of pid1
+	pid2 => checks pid owner of pid2
+
+
+static int check_pid_monitored(int sysc, pid_t pid)
+
+    Purpose:
+	check if pid is already being monitored by the syscall
+	returns 1 if it already is, or 0 if not
+
+    Arguments: 
+	sysc => syscall to check list of
+	pid => pid to check if in sysc list of monitored pid
+
+
+void my_exit_group(int status)
+
+    Purpose:
+	remove pid from all lists of monitored pid when the process exits
+
+    Arguments:
+	status => indicates successful(EXIT_SUCCESS) or unsuccessful(EXIT_FAILURE) termination of a pid
+
+
+asmlinkage long interceptor(struct pt_regs reg)
+
+    Purpose:
+	log a message and call the original syscall
+    returns the system call trap table id number
+
+    Arguments:
+	reg => struct of the register to intercept along with its flags and info
+            info includes register info and how the registers are stored (orig_ax)
+            registers (bx, cx, dx, si, di, bp, ax, ds, es, fs, gs)
+            orig_eax stores syscall number
+            variables (ip, cs flags, sp ss) are the return from for iretq in the stack
+
+
+asmlinkage long my_syscall(int cmd, int syscall, int pid) 
+
+    Purpose:
+
+    Arguments:
+	cmd => this argument determines the purpose of the function
+	       this argument can be one of the following 4 commands:
+	       	- REQUEST_SYSCALL_INTERCEPT, intercepts the 'syscall' argument
+		- REQUEST_SYSCALL_RELEASE  , de-intercept the 'syscall' argument
+		- REQUEST_START_MONITORING , start monitoring for 'pid' whenever it issues 'syscall'
+		- REQUEST_STOP_MONITORING  , stop monitoring for 'pid'
+	syscall => ***check documentation for cmd to know what this argument is used for***
+	pid => if this is 0, it translates to all 'pid'
+               ***check documentation for cmd to know more about this argument***
+
+
+static int init_function(void) 
+
+    Purpose:
+	initializes module
+
+    Arguments:
+	***NONE***
+
+
+static void exit_function(void)
+
+    Purpose:
+	exits module
+
+    Arguments:
+	***NONE***
+
+
+============================================================================================================
+#
+# END.
+#
+============================================================================================================
+
+
+	
+
+
+
+
+
+
+
+
+
